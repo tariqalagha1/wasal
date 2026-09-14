@@ -51,7 +51,9 @@ export default function LoginScreen() {
           <button className="btn" type="submit" disabled={loading}>
             {loading ? t('loading') : t('signIn')}
           </button>
-          <div className="muted">admin / admin123 · reception / reception123 · WIN1..4 / cashier123</div>
+          {import.meta.env.VITE_DEMO !== 'true' && (
+            <div className="muted">admin / admin123 · reception / reception123 · WIN1..4 / cashier123</div>
+          )}
         </div>
       </form>
     </div>
