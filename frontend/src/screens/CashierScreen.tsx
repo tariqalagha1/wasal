@@ -46,8 +46,13 @@ export default function CashierScreen() {
     setError('')
     setSuccess('')
     try {
-      await api.post(path, body)
-      setSuccess(t('success'))
+      const res: any = await api.post(path, body)
+      if (res && res.result === 'QUEUE_EMPTY') {
+        setError(t('queueEmpty'))
+      } else {
+        setSuccess(t('success'))
+      }
+      return res
     } catch (e: any) {
       setError(e.message)
     }
@@ -68,7 +73,7 @@ export default function CashierScreen() {
           <span className={`pill ${(currentStatus || '').toLowerCase()}`}>{currentStatus ? t(currentStatus.toLowerCase()) : ''}</span>
         </div>
         <div className="row" style={{ justifyContent: 'center', marginTop: 16 }}>
-          <button className="btn" disabled={!online || !!current} onClick={() => act(`/api/cashiers/${me?.id}/call-next`)}>
+          <button className="btn" disabled={!online || !!current || (waiting?.waiting.length ?? 0) === 0} onClick={() => act(`/api/cashiers/${me?.id}/call-next`)}>
             {t('callNext')}
           </button>
           <button className="btn ghost" disabled={!online || currentStatus !== 'CALLED'} onClick={() => act(`/api/tickets/${currentId}/recall`)}>
