@@ -1,0 +1,216 @@
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+
+type Locale = 'en' | 'ar'
+
+const en: Record<string, string> = {
+  appName: 'Queue Management System',
+  login: 'Login',
+  username: 'Username',
+  password: 'Password',
+  signIn: 'Sign in',
+  logout: 'Logout',
+  checkIn: 'Check-in',
+  cashier: 'Cashier',
+  display: 'Display',
+  callingScreen: 'Calling Screen',
+  admin: 'Admin',
+  reports: 'Reports',
+  audit: 'Audit',
+  settings: 'Settings',
+  search: 'Search',
+  searchPlaceholder: 'Booking number, guardian name or phone',
+  guardian: 'Guardian',
+  student: 'Student',
+  bookingNumber: 'Booking #',
+  appointmentTime: 'Appointment time',
+  status: 'Status',
+  scheduled: 'Scheduled',
+  checkedIn: 'Checked-in',
+  served: 'Served',
+  missed: 'Missed',
+  cancelled: 'Cancelled',
+  waiting: 'Waiting',
+  called: 'Called',
+  serving: 'Serving',
+  done: 'Done',
+  noShow: 'No show',
+  early: 'Early',
+  late: 'Late',
+  walkIn: 'Walk-in',
+  selectAppointments: 'Select appointments for this visit',
+  checkInNow: 'Check in',
+  createWalkIn: 'Create walk-in',
+  walkInName: 'Walk-in guardian name',
+  walkInPhone: 'Phone (optional)',
+  ticket: 'Ticket',
+  ticketNumber: 'Ticket number',
+  window: 'Window',
+  callNext: 'Call next',
+  recall: 'Recall',
+  startServing: 'Start serving',
+  markDone: 'Done',
+  markNoShow: 'No-show',
+  returnToQueue: 'Return to queue',
+  cancel: 'Cancel',
+  cancelReason: 'Cancellation reason',
+  nowServing: 'NOW SERVING',
+  waitingCount: 'Waiting',
+  currentTicket: 'Current ticket',
+  recentCalls: 'Recently called',
+  offline: 'Offline — reconnecting…',
+  online: 'Online',
+  noAppointments: 'No appointments found',
+  noWaiting: 'Queue is empty',
+  runImport: 'Run today\'s import',
+  importStatus: 'Import status',
+  exportCsv: 'Export CSV',
+  users: 'Users',
+  cashiers: 'Cashiers',
+  role: 'Role',
+  language: 'Language',
+  english: 'English',
+  arabic: 'العربية',
+  queueEmpty: 'Queue is empty',
+  success: 'Success',
+  error: 'Error',
+  loading: 'Loading…',
+  arrival: 'Arrival',
+  queueEntry: 'Queue entry',
+  calledAt: 'Called at',
+  startedAt: 'Service start',
+  completedAt: 'Completed at',
+  waitingDuration: 'Waiting duration',
+  serviceDuration: 'Service duration',
+  actor: 'Actor',
+  action: 'Action',
+  entity: 'Entity',
+  from: 'From',
+  to: 'To',
+  occurredAt: 'Occurred at',
+  correlationId: 'Correlation ID',
+  visitType: 'Visit type',
+  multiAppointment: 'Multi-appointment',
+}
+
+const ar: Record<string, string> = {
+  appName: 'نظام إدارة الطوابير',
+  login: 'تسجيل الدخول',
+  username: 'اسم المستخدم',
+  password: 'كلمة المرور',
+  signIn: 'دخول',
+  logout: 'خروج',
+  checkIn: 'الاستقبال',
+  cashier: 'الكاشير',
+  display: 'الشاشة',
+  callingScreen: 'شاشة النداء',
+  admin: 'الإدارة',
+  reports: 'التقارير',
+  audit: 'سجل التدقيق',
+  settings: 'الإعدادات',
+  search: 'بحث',
+  searchPlaceholder: 'رقم الحجز أو اسم ولي الأمر أو الهاتف',
+  guardian: 'ولي الأمر',
+  student: 'الطالب',
+  bookingNumber: 'رقم الحجز',
+  appointmentTime: 'وقت الموعد',
+  status: 'الحالة',
+  scheduled: 'مجدول',
+  checkedIn: 'تم التسجيل',
+  served: 'تمت الخدمة',
+  missed: 'لم يحضر',
+  cancelled: 'ملغي',
+  waiting: 'بانتظار',
+  called: 'تم النداء',
+  serving: 'قيد الخدمة',
+  done: 'منجز',
+  noShow: 'لم يحضر',
+  early: 'مبكر',
+  late: 'متأخر',
+  walkIn: 'بدون موعد',
+  selectAppointments: 'اختر المواعيد لهذه الزيارة',
+  checkInNow: 'تسجيل حضور',
+  createWalkIn: 'إنشاء زيارة بدون موعد',
+  walkInName: 'اسم ولي الأمر (بدون موعد)',
+  walkInPhone: 'الهاتف (اختياري)',
+  ticket: 'التذكرة',
+  ticketNumber: 'رقم التذكرة',
+  window: 'النافذة',
+  callNext: 'استدعاء التالي',
+  recall: 'إعادة نداء',
+  startServing: 'بدء الخدمة',
+  markDone: 'إنهاء',
+  markNoShow: 'لم يحضر',
+  returnToQueue: 'إرجاع للطابور',
+  cancel: 'إلغاء',
+  cancelReason: 'سبب الإلغاء',
+  nowServing: 'يُخدم الآن',
+  waitingCount: 'المنتظرون',
+  currentTicket: 'التذكرة الحالية',
+  recentCalls: 'آخر النداءات',
+  offline: 'غير متصل — جارٍ إعادة الاتصال…',
+  online: 'متصل',
+  noAppointments: 'لا توجد مواعيد',
+  noWaiting: 'الطابور فارغ',
+  runImport: 'تشغيل استيراد اليوم',
+  importStatus: 'حالة الاستيراد',
+  exportCsv: 'تصدير CSV',
+  users: 'المستخدمون',
+  cashiers: 'النوافذ',
+  role: 'الدور',
+  language: 'اللغة',
+  english: 'English',
+  arabic: 'العربية',
+  queueEmpty: 'الطابور فارغ',
+  success: 'نجاح',
+  error: 'خطأ',
+  loading: 'جارٍ التحميل…',
+  arrival: 'الوصول',
+  queueEntry: 'دخول الطابور',
+  calledAt: 'وقت النداء',
+  startedAt: 'بدء الخدمة',
+  completedAt: 'وقت الإنجاز',
+  waitingDuration: 'مدة الانتظار',
+  serviceDuration: 'مدة الخدمة',
+  actor: 'المنفذ',
+  action: 'الإجراء',
+  entity: 'الكيان',
+  from: 'من',
+  to: 'إلى',
+  occurredAt: 'وقت الحدوث',
+  correlationId: 'معرف الارتباط',
+  visitType: 'نوع الزيارة',
+  multiAppointment: 'مواعيد متعددة',
+}
+
+const dicts: Record<Locale, Record<string, string>> = { en, ar }
+
+interface I18nCtx {
+  locale: Locale
+  dir: 'ltr' | 'rtl'
+  t: (key: string) => string
+  setLocale: (l: Locale) => void
+}
+
+const Ctx = createContext<I18nCtx>({ locale: 'en', dir: 'ltr', t: (k) => k, setLocale: () => {} })
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [locale, setLocaleState] = useState<Locale>(() => (localStorage.getItem('qms_locale') as Locale) || 'en')
+
+  useEffect(() => {
+    document.documentElement.lang = locale
+    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+  }, [locale])
+
+  const t = (key: string) => dicts[locale][key] ?? en[key] ?? key
+
+  const setLocale = (l: Locale) => {
+    localStorage.setItem('qms_locale', l)
+    setLocaleState(l)
+  }
+
+  return <Ctx.Provider value={{ locale, dir: locale === 'ar' ? 'rtl' : 'ltr', t, setLocale }}>{children}</Ctx.Provider>
+}
+
+export function useI18n() {
+  return useContext(Ctx)
+}

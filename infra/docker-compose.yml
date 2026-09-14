@@ -1,0 +1,47 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: qms
+      MYSQL_USER: qms_user
+      MYSQL_PASSWORD: qms_pass
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uqms_user", "-pqms_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ../backend
+    environment:
+      APP_ENV: production
+      APP_TIMEZONE: Asia/Riyadh
+      DATABASE_URL: mysql+asyncmy://qms_user:qms_pass@mysql:3306/qms?charset=utf8mb4
+      JWT_SECRET: replace_with_a_long_random_secret
+      DEFAULT_LOCALE: en
+      SUPPORTED_LOCALES: en,ar
+      EARLY_THRESHOLD_MINUTES: "15"
+      LATE_THRESHOLD_MINUTES: "15"
+      DAILY_IMPORT_TIME: "05:00"
+      CORS_ORIGINS: http://localhost:5173
+    ports:
+      - "8100:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
