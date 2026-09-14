@@ -30,6 +30,7 @@ export default function CallingScreen() {
 
   return (
     <div className="calling-screen">
+      {import.meta.env.VITE_DEMO === 'true' && <div className="demo-badge" style={{ position: 'absolute', top: 16, insetInlineStart: 16 }}>DEMO</div>}
       {!online && <div className="offline-banner">{t('offline')}</div>}
       <div className="school">{t('appName')}</div>
       <div className="clock">{clock.toLocaleTimeString()}</div>

@@ -34,6 +34,8 @@ body {
 .net.ok { background: #dcfce7; color: var(--ok); }
 .net.bad { background: #fee2e2; color: var(--danger); }
 
+.demo-badge { background: #f59e0b; color: #fff; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; letter-spacing: 1px; }
+
 .offline-banner { background: var(--warn); color: #fff; padding: 8px 20px; font-weight: 600; text-align: center; }
 
 main { padding: 20px; flex: 1; }

@@ -30,7 +30,9 @@ export default function DisplayScreen() {
   return (
     <div style={{ padding: 20 }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <h1>{t('appName')}</h1>
+        <h1>
+          {t('appName')} {import.meta.env.VITE_DEMO === 'true' && <span className="demo-badge">DEMO</span>}
+        </h1>
         <span className={`net ${online ? 'ok' : 'bad'}`}>{online ? t('online') : t('offline')}</span>
       </div>
       <div className="grid">

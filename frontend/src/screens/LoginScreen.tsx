@@ -35,7 +35,9 @@ export default function LoginScreen() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <form className="card" style={{ width: 360 }} onSubmit={submit}>
-        <h1>{t('appName')}</h1>
+        <h1>
+          {t('appName')} {import.meta.env.VITE_DEMO === 'true' && <span className="demo-badge">DEMO</span>}
+        </h1>
         {error && <div className="error-box">{error}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <label>

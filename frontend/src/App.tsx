@@ -27,6 +27,7 @@ function Layout({ children }: { children: JSX.Element }) {
     <div className="app">
       <header className="topbar">
         <div className="brand">{t('appName')}</div>
+        {import.meta.env.VITE_DEMO === 'true' && <span className="demo-badge">DEMO</span>}
         {user && (
           <nav>
             {(user.role === 'RECEPTIONIST' || user.role === 'ADMIN') && <Link to="/check-in">{t('checkIn')}</Link>}

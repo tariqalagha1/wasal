@@ -6,3 +6,5 @@ dist/
 .env
 evidence/runs/
 *.log
+deploy/demo/.env
+deploy/demo/CUSTOMER_CREDENTIALS.txt

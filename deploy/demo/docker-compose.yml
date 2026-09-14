@@ -1,0 +1,53 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: qms-demo-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DEMO_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: qms_demo
+      MYSQL_USER: qms_demo_user
+      MYSQL_PASSWORD: ${DEMO_DB_PASSWORD}
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "127.0.0.1:3308:3306"   # localhost only — NOT publicly exposed
+    volumes:
+      - demo_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uqms_demo_user", "-p${DEMO_DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ../../backend
+    container_name: qms-demo-backend
+    environment:
+      APP_ENV: production
+      APP_TIMEZONE: Asia/Riyadh
+      DATABASE_URL: mysql+asyncmy://qms_demo_user:${DEMO_DB_PASSWORD}@db:3306/qms_demo?charset=utf8mb4
+      JWT_SECRET: ${DEMO_JWT_SECRET}
+      DEFAULT_LOCALE: en
+      SUPPORTED_LOCALES: en,ar
+      EARLY_THRESHOLD_MINUTES: "15"
+      LATE_THRESHOLD_MINUTES: "15"
+      DAILY_IMPORT_TIME: "05:00"
+      CORS_ORIGINS: https://${DEMO_DOMAIN}
+    ports:
+      - "127.0.0.1:8101:8000"   # localhost only — NOT publicly exposed
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../../frontend
+      args:
+        VITE_DEMO: "true"
+    container_name: qms-demo-frontend
+    ports:
+      - "127.0.0.1:8081:80"     # localhost only — NOT publicly exposed
+    depends_on:
+      - backend
+
+volumes:
+  demo_mysql_data:

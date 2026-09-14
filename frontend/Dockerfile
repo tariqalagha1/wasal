@@ -2,6 +2,9 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
+ARG VITE_DEMO=false
+ENV VITE_DEMO=$VITE_DEMO
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
