@@ -31,6 +31,10 @@ class WsClient {
     this.ws.onerror = () => {
       this.setOnline(false)
     }
+    // Also track browser network state for prompt offline detection.
+    window.addEventListener('online', () => this.setOnline(true))
+    window.addEventListener('offline', () => this.setOnline(false))
+    this.online = navigator.onLine
   }
 
   private setOnline(v: boolean) {

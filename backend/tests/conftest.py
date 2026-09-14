@@ -52,6 +52,9 @@ async def _reset_ops():
             await conn.execute(text(f"DELETE FROM {t}"))
         await conn.execute(text("DELETE FROM appointments"))
         await conn.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
+        # Reset locale state so each test starts with English defaults.
+        await conn.execute(text("DELETE FROM system_settings WHERE setting_key IN ('public_display_locale','calling_screen_locale')"))
+        await conn.execute(text("UPDATE users SET preferred_locale = 'en'"))
 
 
 @pytest.fixture(autouse=True)

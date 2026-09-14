@@ -40,11 +40,11 @@ export default function LoginScreen() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <label>
             <div className="muted">{t('username')}</div>
-            <input value={username} onChange={(e) => setUsername(e.target.value)} autoFocus />
+            <input placeholder={t('username')} value={username} onChange={(e) => setUsername(e.target.value)} autoFocus />
           </label>
           <label>
             <div className="muted">{t('password')}</div>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input type="password" placeholder={t('password')} value={password} onChange={(e) => setPassword(e.target.value)} />
           </label>
           <button className="btn" type="submit" disabled={loading}>
             {loading ? t('loading') : t('signIn')}
