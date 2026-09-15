@@ -1,61 +1,43 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { useI18n } from '../i18n'
 import { useOnline, useLive } from '../hooks'
-
-interface DisplayState {
-  service_date: string
-  waiting_count: number
-  cashiers: { id: number; display_name: string; current_ticket: number | null; current_status: string | null }[]
-  recent: { ticket_number: number; window: string; status: string }[]
-}
+import DisplayCanvas, { DisplayConfig, QueueData } from '../DisplayCanvas'
 
 export default function DisplayScreen() {
-  const { t, setLocale } = useI18n()
+  const { setLocale } = useI18n()
   const online = useOnline()
+  const [config, setConfig] = useState<DisplayConfig | null>(null)
 
   useEffect(() => {
     api
       .get<{ locale: 'en' | 'ar' }>('/api/settings/language?scope=public_display')
       .then((r) => setLocale(r.locale))
       .catch(() => {})
+    api.get<DisplayConfig>('/api/display-config').then(setConfig).catch(() => {})
   }, [setLocale])
 
-  const state = useLive<DisplayState>(
-    () => api.get('/api/display/state'),
+  const data = useLive<QueueData>(
+    () => api.get('/api/public-display/state'),
     3000,
-    ['ticket.called', 'ticket.completed', 'ticket.checked_in', 'ticket.no_show', 'ticket.recalled', 'queue.updated'],
+    [
+      'ticket.called',
+      'ticket.completed',
+      'ticket.checked_in',
+      'ticket.no_show',
+      'ticket.recalled',
+      'ticket.returned_to_queue',
+      'ticket.cancelled',
+      'ticket.serving',
+      'queue.updated',
+      'cashier.state_changed',
+    ],
   )
 
   return (
-    <div style={{ padding: 20 }}>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <h1>
-          {t('appName')} {import.meta.env.VITE_DEMO === 'true' && <span className="demo-badge">DEMO</span>}
-        </h1>
-        <span className={`net ${online ? 'ok' : 'bad'}`}>{online ? t('online') : t('offline')}</span>
-      </div>
-      <div className="grid">
-        {state?.cashiers.map((c) => (
-          <div className="display-cashier" key={c.id}>
-            <div className="win">{c.display_name}</div>
-            <div className="num">{c.current_ticket ?? '—'}</div>
-            <div className="st">{c.current_status ? t(c.current_status.toLowerCase()) : ''}</div>
-          </div>
-        ))}
-      </div>
-      <div className="card" style={{ marginTop: 20 }}>
-        <h2>
-          {t('waitingCount')}: {state?.waiting_count ?? 0}
-        </h2>
-        <div className="row" style={{ flexWrap: 'wrap' }}>
-          {state?.recent.map((r, i) => (
-            <span key={i} className="pill serving">
-              {t('ticket')} {r.ticket_number} — {r.window}
-            </span>
-          ))}
-        </div>
-      </div>
+    <div style={{ position: 'fixed', inset: 0 }}>
+      {config && <DisplayCanvas config={config} data={data} />}
+      {!online && <div className="offline-banner">{online ? '' : 'Offline — reconnecting…'}</div>}
     </div>
   )
 }

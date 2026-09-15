@@ -1,21 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { useI18n } from '../i18n'
+import { useOrganization } from '../org'
+import Clock from '../Clock'
 
 export default function LoginScreen() {
   const { t } = useI18n()
   const { login, user } = useAuth()
+  const { org } = useOrganization()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  if (user) {
-    navigate(user.role === 'CASHIER' ? `/cashier/${user.username}` : '/check-in', { replace: true })
-    return null
-  }
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === 'CASHIER' ? `/cashier/${user.username}` : '/check-in', { replace: true })
+    }
+  }, [user, navigate])
+
+  if (user) return null
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,8 +42,10 @@ export default function LoginScreen() {
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <form className="card" style={{ width: 360 }} onSubmit={submit}>
         <h1>
-          {t('appName')} {import.meta.env.VITE_DEMO === 'true' && <span className="demo-badge">DEMO</span>}
+          {org.name || t('appName')} {import.meta.env.VITE_DEMO === 'true' && <span className="demo-badge">DEMO</span>}
         </h1>
+        {org.tagline && <div className="muted" style={{ marginBottom: 12 }}>{org.tagline}</div>}
+        <div style={{ marginBottom: 12 }}><Clock /></div>
         {error && <div className="error-box">{error}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <label>

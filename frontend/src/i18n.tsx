@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { api } from './api'
 
 type Locale = 'en' | 'ar'
 
@@ -57,6 +58,42 @@ const en: Record<string, string> = {
   waitingCount: 'Waiting',
   currentTicket: 'Current ticket',
   recentCalls: 'Recently called',
+  counters: 'Counters',
+  waitingBookings: 'Waiting Bookings',
+  missedBookings: 'Missed Bookings',
+  proceedTo: 'Please proceed to',
+  noMissed: 'No missed bookings',
+  displayDesigner: 'Display Designer',
+  saveDraft: 'Save Draft',
+  publish: 'Publish',
+  resetLayout: 'Reset Layout',
+  presets: 'Presets',
+  element: 'Element',
+  resetElement: 'Reset element',
+  position: 'Position',
+  size: 'Size',
+  colors: 'Colors',
+  typography: 'Typography',
+  visible: 'Visible',
+  lockPosition: 'Lock position',
+  background: 'Background',
+  textColor: 'Text',
+  borderColor: 'Border',
+  fontSize: 'Font size',
+  fontWeight: 'Weight',
+  textAlign: 'Align',
+  borderWidth: 'Border width',
+  borderRadius: 'Radius',
+  headerTitle: 'Header title',
+  subtitle: 'Subtitle',
+  logo: 'Logo',
+  showLogo: 'Show logo',
+  showName: 'Show name',
+  identity: 'Identity',
+  displayName: 'Display name',
+  theme: 'Theme',
+  accent: 'Accent',
+  selectElementHint: 'Select an element on the canvas to edit its properties',
   offline: 'Offline — reconnecting…',
   online: 'Online',
   noAppointments: 'No appointments found',
@@ -68,6 +105,11 @@ const en: Record<string, string> = {
   cashiers: 'Cashiers',
   role: 'Role',
   language: 'Language',
+  appLanguage: 'App language',
+  clientName: 'Client name',
+  tagline: 'Tagline',
+  organization: 'Organization',
+  save: 'Save',
   english: 'English',
   arabic: 'العربية',
   queueEmpty: 'Queue is empty',
@@ -147,6 +189,42 @@ const ar: Record<string, string> = {
   waitingCount: 'المنتظرون',
   currentTicket: 'التذكرة الحالية',
   recentCalls: 'آخر النداءات',
+  counters: 'النوافذ',
+  waitingBookings: 'الحجوزات المنتظرة',
+  missedBookings: 'الحجوزات المفوّتة',
+  proceedTo: 'الرجاء التوجه إلى',
+  noMissed: 'لا توجد حجوزات مفوّتة',
+  displayDesigner: 'مصمم الشاشة',
+  saveDraft: 'حفظ المسودة',
+  publish: 'نشر',
+  resetLayout: 'إعادة تعيين التخطيط',
+  presets: 'القوالب',
+  element: 'العنصر',
+  resetElement: 'إعادة تعيين العنصر',
+  position: 'الموقع',
+  size: 'الحجم',
+  colors: 'الألوان',
+  typography: 'الخط',
+  visible: 'ظاهر',
+  lockPosition: 'قفل الموقع',
+  background: 'الخلفية',
+  textColor: 'النص',
+  borderColor: 'الحدود',
+  fontSize: 'حجم الخط',
+  fontWeight: 'السماكة',
+  textAlign: 'المحاذاة',
+  borderWidth: 'سمك الحدود',
+  borderRadius: 'الاستدارة',
+  headerTitle: 'عنوان الهيدر',
+  subtitle: 'السطر التعريفي',
+  logo: 'الشعار',
+  showLogo: 'إظهار الشعار',
+  showName: 'إظهار الاسم',
+  identity: 'الهوية',
+  displayName: 'اسم العرض',
+  theme: 'السمة',
+  accent: 'اللون المميز',
+  selectElementHint: 'اختر عنصرًا على الشاشة لتعديل خصائصه',
   offline: 'غير متصل — جارٍ إعادة الاتصال…',
   online: 'متصل',
   noAppointments: 'لا توجد مواعيد',
@@ -158,6 +236,11 @@ const ar: Record<string, string> = {
   cashiers: 'النوافذ',
   role: 'الدور',
   language: 'اللغة',
+  appLanguage: 'لغة التطبيق',
+  clientName: 'اسم العميل',
+  tagline: 'السطر التعريفي',
+  organization: 'المنشأة',
+  save: 'حفظ',
   english: 'English',
   arabic: 'العربية',
   queueEmpty: 'الطابور فارغ',
@@ -200,6 +283,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = locale
     document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
   }, [locale])
+
+  // If the user hasn't chosen a personal language, use the admin's global default.
+  useEffect(() => {
+    if (localStorage.getItem('qms_locale')) return
+    api
+      .get<{ locale: 'en' | 'ar' }>('/api/settings/language?scope=app')
+      .then((r) => {
+        if (r.locale === 'ar' || r.locale === 'en') setLocaleState(r.locale)
+      })
+      .catch(() => {})
+  }, [])
 
   const t = (key: string) => dicts[locale][key] ?? en[key] ?? key
 

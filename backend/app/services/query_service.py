@@ -192,6 +192,66 @@ async def calling_screen_state(service_date=None) -> dict:
     }
 
 
+async def public_display_state(service_date=None) -> dict:
+    """Authoritative state for the public waiting-room display.
+
+    Single source of truth: now_serving (latest CALLED/SERVING ticket),
+    every active counter with its current ticket, the waiting list, and the
+    missed (NO_SHOW) list. All read from MySQL.
+    """
+    service_date = service_date or today_local()
+    cashiers = await cashiers_state(service_date)
+    waiting = await waiting_queue(service_date)
+
+    async with engine.connect() as conn:
+        now_serving_row = (
+            await conn.execute(
+                text(
+                    "SELECT t.ticket_number, t.cashier_id, c.display_name, t.called_at "
+                    "FROM queue_tickets t JOIN cashiers c ON c.id = t.cashier_id "
+                    "WHERE t.status IN ('CALLED','SERVING') AND t.service_date = :d "
+                    "ORDER BY t.called_at DESC LIMIT 1"
+                ),
+                {"d": service_date},
+            )
+        ).first()
+        missed_rows = (
+            await conn.execute(
+                text(
+                    "SELECT t.ticket_number, c.display_name, t.called_at "
+                    "FROM queue_tickets t LEFT JOIN cashiers c ON c.id = t.cashier_id "
+                    "WHERE t.status = 'NO_SHOW' AND t.service_date = :d "
+                    "ORDER BY t.called_at DESC"
+                ),
+                {"d": service_date},
+            )
+        ).fetchall()
+
+    return {
+        "service_date": str(service_date),
+        "now_serving": (
+            {
+                "ticket_number": now_serving_row.ticket_number,
+                "counter_id": now_serving_row.cashier_id,
+                "counter_name": now_serving_row.display_name,
+                "called_at": now_serving_row.called_at.isoformat(sep=" ") if now_serving_row.called_at else None,
+            }
+            if now_serving_row is not None
+            else None
+        ),
+        "counters": cashiers,
+        "waiting": [{"ticket_number": w["ticket_number"], "position": i + 1} for i, w in enumerate(waiting)],
+        "missed": [
+            {
+                "ticket_number": r.ticket_number,
+                "counter_name": r.display_name,
+                "missed_at": r.called_at.isoformat(sep=" ") if r.called_at else None,
+            }
+            for r in missed_rows
+        ],
+    }
+
+
 async def report(filters: dict) -> list[dict]:
     service_date = filters.get("service_date") or today_local()
     clauses = ["t.service_date = :d"]

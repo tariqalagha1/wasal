@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, newIdempotencyKey } from '../api'
 import { useI18n } from '../i18n'
+import { useOrganization } from '../org'
 
 interface Appt {
   id: number
@@ -15,6 +16,7 @@ interface Appt {
 
 export default function CheckInScreen() {
   const { t } = useI18n()
+  const { org } = useOrganization()
   const [search, setSearch] = useState('')
   const [appts, setAppts] = useState<Appt[]>([])
   const [selected, setSelected] = useState<number[]>([])
@@ -83,6 +85,12 @@ export default function CheckInScreen() {
 
   return (
     <div>
+      {(org.name || org.tagline) && (
+        <div className="org-banner">
+          {org.name && <div className="org-name">{org.name}</div>}
+          {org.tagline && <div className="org-tagline">{org.tagline}</div>}
+        </div>
+      )}
       <h1>{t('checkIn')}</h1>
       <div className="card">
         <div className="row" style={{ marginBottom: 12 }}>

@@ -34,6 +34,8 @@ body {
 .net.ok { background: #dcfce7; color: var(--ok); }
 .net.bad { background: #fee2e2; color: var(--danger); }
 
+.clock-inline { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
 .demo-badge { background: #f59e0b; color: #fff; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; letter-spacing: 1px; }
 
 .offline-banner { background: var(--warn); color: #fff; padding: 8px 20px; font-weight: 600; text-align: center; }
@@ -76,15 +78,16 @@ button.btn.sm { padding: 5px 10px; font-size: 0.85rem; }
 .error-box { background: #fee2e2; color: #991b1b; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; }
 .success-box { background: #dcfce7; color: #166534; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; }
 
-/* Calling screen — large, high contrast */
-.calling-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: #fff; text-align: center; padding: 40px; }
-.calling-screen .school { font-size: 1.5rem; opacity: 0.8; }
-.calling-screen .now { font-size: 1.4rem; letter-spacing: 4px; margin-top: 30px; color: #fbbf24; text-transform: uppercase; }
+/* Calling screen — matches the public display light theme */
+.calling-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg); color: var(--text); text-align: center; padding: 40px; }
+.calling-screen .school { font-size: 2.2rem; font-weight: 700; }
+.calling-screen .school-tagline { font-size: 1.3rem; color: var(--muted); margin-top: 6px; }
+.calling-screen .now { font-size: 1.4rem; letter-spacing: 4px; margin-top: 30px; color: var(--accent); text-transform: uppercase; }
 .calling-screen .ticket { font-size: 9rem; font-weight: 900; line-height: 1; margin: 20px 0; }
-.calling-screen .window { font-size: 4rem; font-weight: 700; color: #38bdf8; }
+.calling-screen .window { font-size: 4rem; font-weight: 700; color: var(--accent); }
 .calling-screen .recent { margin-top: 50px; font-size: 1.6rem; opacity: 0.85; }
 .calling-screen .recent div { margin: 6px 0; }
-.calling-screen .clock { font-size: 1.1rem; opacity: 0.6; margin-top: 10px; }
+.calling-screen .clock { font-size: 1.3rem; color: var(--muted); margin-top: 14px; }
 
 /* Display screen */
 .display-cashier { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center; }
@@ -92,7 +95,63 @@ button.btn.sm { padding: 5px 10px; font-size: 0.85rem; }
 .display-cashier .num { font-size: 3rem; font-weight: 800; margin: 8px 0; }
 .display-cashier .st { font-size: 0.85rem; }
 
+/* Organization branding banner (check-in screen) */
+.org-banner { text-align: center; margin-bottom: 16px; }
+.org-name { font-size: 1.6rem; font-weight: 800; color: var(--text); }
+.org-tagline { font-size: 1rem; color: var(--muted); margin-top: 2px; }
+
 @media (max-width: 720px) {
   .calling-screen .ticket { font-size: 6rem; }
   .calling-screen .window { font-size: 2.6rem; }
 }
+
+/* Public waiting-room display — 16:9 TV/monitor */
+.public-display { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg); color: var(--text); }
+.pd-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 24px; background: var(--card); border-bottom: 1px solid var(--border); }
+.pd-name { font-size: 1.6rem; font-weight: 800; }
+.pd-tagline { font-size: 1rem; color: var(--muted); }
+.pd-clock { font-size: 1.15rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.pd-body { display: grid; grid-template-columns: 280px 1fr 340px; gap: 16px; padding: 20px; flex: 1; }
+.pd-panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.pd-panel-title { font-size: 1rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px; }
+
+.pd-counter-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pd-counter { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); font-size: 1.1rem; }
+.pd-counter.active { background: #dbeafe; border-color: var(--accent); }
+.pd-counter-id { font-weight: 700; color: var(--muted); }
+.pd-counter-ticket { font-size: 1.6rem; font-weight: 800; color: var(--text); }
+
+.pd-now { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.pd-now-label { font-size: 1.2rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; font-weight: 700; }
+.pd-now-ticket { font-size: 8rem; font-weight: 900; line-height: 1; margin: 12px 0; animation: pd-pop 0.4s ease; }
+.pd-now-ticket.dim { opacity: 0.25; animation: none; }
+.pd-now-counter { font-size: 1.8rem; font-weight: 700; color: var(--text); }
+@keyframes pd-pop { from { transform: scale(1.08); opacity: 0.5; } to { transform: scale(1); opacity: 1; } }
+
+.pd-list { display: flex; flex-direction: column; gap: 8px; max-height: 38vh; overflow-y: auto; }
+.pd-item { padding: 10px 14px; border-radius: 8px; font-size: 1.2rem; font-weight: 700; text-align: center; }
+.pd-item.waiting { background: #e0e7ff; color: #3730a3; }
+.pd-item.missed { background: #fee2e2; color: #991b1b; }
+.pd-empty { color: var(--muted); font-size: 0.95rem; padding: 8px 0; }
+
+@media (max-width: 900px) {
+  .pd-body { grid-template-columns: 1fr; }
+  .pd-now-ticket { font-size: 5rem; }
+  .pd-now-counter { font-size: 1.4rem; }
+}
+
+/* Display Designer */
+.designer { display: flex; flex-direction: column; min-height: calc(100vh - 90px); }
+.designer-top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
+.designer-top h1 { margin: 0; }
+.designer-body { display: flex; gap: 16px; flex: 1; min-height: 0; }
+.designer-sidebar { width: 330px; flex-shrink: 0; overflow-y: auto; }
+.designer-canvas { flex: 1; min-width: 0; background: #111; border-radius: 8px; overflow: hidden; }
+
+.ds-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; font-size: 0.85rem; }
+.ds-field > span:first-child { color: var(--muted); font-weight: 600; }
+.ds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ds-check { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+
+.dc-viewport { background: #0a0a0a; }

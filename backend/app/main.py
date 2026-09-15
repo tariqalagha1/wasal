@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import contextlib
+import os
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from app.api import admin_router, appointments_router, auth_router, cashier_router, display_router, reception_router
+from app.api import admin_router, appointments_router, auth_router, cashier_router, display_config_router, display_router, reception_router
 from app.core.config import settings
 from app.core.errors import register_error_handlers
 from app.core.migrations import apply_migrations
@@ -39,7 +41,13 @@ app.include_router(appointments_router.router)
 app.include_router(reception_router.router)
 app.include_router(cashier_router.router)
 app.include_router(display_router.router)
+app.include_router(display_config_router.router)
 app.include_router(admin_router.router)
+
+# Uploaded display assets (logos/images) — served statically.
+_upload_dir = os.environ.get("UPLOAD_DIR", "/app/uploads")
+os.makedirs(_upload_dir, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=_upload_dir), name="uploads")
 
 
 @app.get("/health")

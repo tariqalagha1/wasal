@@ -34,6 +34,8 @@ services:
       CORS_ORIGINS: https://${DEMO_DOMAIN}
     ports:
       - "127.0.0.1:8101:8000"   # localhost only — NOT publicly exposed
+    volumes:
+      - demo_uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -51,3 +53,4 @@ services:
 
 volumes:
   demo_mysql_data:
+  demo_uploads:
